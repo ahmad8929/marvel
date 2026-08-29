@@ -1,36 +1,52 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# marvels-web
 
-## Getting Started
+Public storefront for **Marvel's Online Clothings** (`www.marvelsonline.in`).
+Next.js 16 (App Router) · TypeScript · Tailwind CSS v4 · deployed to **Vercel**.
 
-First, run the development server:
+Talks to `marvels-api` (`api.marvelsonline.in`) over HTTPS; media served from
+`media.marvelsonline.in`. Full spec: [`../docs/BUILD_BRIEF.md`](../docs/BUILD_BRIEF.md).
+
+## Getting started
 
 ```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+npm install
+cp .env.example .env.local   # fill in values
+npm run dev                  # http://localhost:3000
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+## Scripts
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+| Command | What |
+|---|---|
+| `npm run dev` | Dev server (Turbopack) |
+| `npm run build` | Production build |
+| `npm run start` | Serve the production build |
+| `npm run lint` | ESLint |
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+## Structure
 
-## Learn More
+```
+app/            routes (storefront group, api handlers, sitemap/robots/OG)
+components/ui/         headless + Tailwind primitives
+components/storefront/ page-level sections (header, footer, product card, ...)
+lib/            api client, auth/session, seo, formatting helpers
+stores/         Zustand stores (cart, ui)
+public/brand/   logo SVG set
+```
 
-To learn more about Next.js, take a look at the following resources:
+## Brand
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+Design tokens live in [`app/globals.css`](app/globals.css) (`@theme`): `primary` (maroon
+`#6D1533`), `gold`, `blush`, `bg` (ivory), `ink`, `line`, `sale`. Fonts (via `next/font`):
+`font-display` Playfair Display, `font-serif` Cormorant Garamond, `font-sans` Jost,
+`font-script` Dancing Script.
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+Logo: `public/brand/logo-full.svg` (header lockup), `logo-stacked.svg` (emails / splash),
+`logo-mark.svg` (monogram), `logo-light.svg` (ivory, for the maroon footer),
+`app/icon.svg` (favicon). Original artwork — informed by the brand promo graphics.
+Wordmark uses live `<text>`; convert to outlines before final launch for pixel-perfect
+rendering off-site.
 
-## Deploy on Vercel
+## Status
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+Phase 0 — scaffold + brand shell. The home route is a temporary branded placeholder.

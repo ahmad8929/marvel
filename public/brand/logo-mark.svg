@@ -1,0 +1,14 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128" role="img" aria-label="Marvel's Online Clothings monogram">
+  <title>Marvel's Online Clothings</title>
+  <!-- heart hook -->
+  <path d="M64 28 C60 21 52 19 52 12.5 C52 7.5 58 6.5 64 12.5 C70 6.5 76 7.5 76 12.5 C76 19 68 21 64 28 Z" fill="#B98A3C"/>
+  <!-- hook stem -->
+  <path d="M64 27 C64 34 61 39 64 45" fill="none" stroke="#B98A3C" stroke-width="3.4" stroke-linecap="round"/>
+  <!-- hanger -->
+  <path d="M64 45 L35 59.5 Q64 66.5 93 59.5 L64 45" fill="none" stroke="#B98A3C" stroke-width="3.4" stroke-linejoin="round" stroke-linecap="round"/>
+  <!-- serif M with feminine sweep -->
+  <path d="M34 104 L34 68 Q49 90 64 100 Q79 90 94 68 L94 104" fill="none" stroke="#6D1533" stroke-width="12" stroke-linecap="round" stroke-linejoin="round"/>
+  <!-- silhouette in the counter -->
+  <circle cx="64" cy="66.5" r="3.6" fill="#B98A3C"/>
+  <path d="M64 70 C60 78 59 88 64 96 C69 88 68 78 64 70 Z" fill="#B98A3C"/>
+</svg>

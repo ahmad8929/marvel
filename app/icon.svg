@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128" role="img" aria-label="Marvel's Online Clothings">
+  <rect width="128" height="128" rx="28" fill="#6D1533"/>
+  <path d="M64 30 C60.5 23.5 53 21.5 53 15.5 C53 11 58.5 10 64 15.5 C69.5 10 75 11 75 15.5 C75 21.5 67.5 23.5 64 30 Z" fill="#B98A3C"/>
+  <path d="M64 29 C64 35 61.5 39.5 64 45" fill="none" stroke="#B98A3C" stroke-width="3.6" stroke-linecap="round"/>
+  <path d="M64 45 L37 58.5 Q64 65 91 58.5 L64 45" fill="none" stroke="#B98A3C" stroke-width="3.6" stroke-linejoin="round" stroke-linecap="round"/>
+  <path d="M36 102 L36 68 Q50 88 64 97 Q78 88 92 68 L92 102" fill="none" stroke="#FCF4EF" stroke-width="12" stroke-linecap="round" stroke-linejoin="round"/>
+</svg>
