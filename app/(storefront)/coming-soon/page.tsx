@@ -60,7 +60,7 @@ export default function ComingSoonPage() {
           </ul>
         </div>
         <p className="mt-8 text-xs uppercase tracking-[0.24em] text-muted">
-          www.marvelsonline.in
+          marvelsazamgarh.in
         </p>
       </section>
     </main>

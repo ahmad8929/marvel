@@ -32,7 +32,7 @@ const dancingScript = Dancing_Script({
   display: "swap",
 });
 
-const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? "https://www.marvelsonline.in";
+const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? "https://marvelsazamgarh.in";
 
 export const metadata: Metadata = {
   metadataBase: new URL(siteUrl),
@@ -41,7 +41,7 @@ export const metadata: Metadata = {
     template: "%s | Marvel's Online Clothings",
   },
   description:
-    "Elegant, feminine, effortless women's ethnic and fusion wear — kurtis, dresses and co-ord sets. Launching soon at marvelsonline.in.",
+    "Elegant, feminine, effortless women's ethnic and fusion wear — kurtis, dresses and co-ord sets. Launching soon at marvelsazamgarh.in.",
   openGraph: {
     title: "Marvel's Online Clothings",
     description: "Timeless style. Made for you.",

@@ -2,7 +2,7 @@ import type { MetadataRoute } from "next";
 import { apiGet } from "@/lib/api";
 import type { Category, Paginated, ProductCard } from "@/lib/types";
 
-const SITE = process.env.NEXT_PUBLIC_SITE_URL ?? "https://www.marvelsonline.in";
+const SITE = process.env.NEXT_PUBLIC_SITE_URL ?? "https://marvelsazamgarh.in";
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const staticRoutes = [

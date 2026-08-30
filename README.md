@@ -1,10 +1,10 @@
 # marvels-web
 
-Public storefront for **Marvel's Online Clothings** (`www.marvelsonline.in`).
+Public storefront for **Marvel's Online Clothings** (`www.marvelsazamgarh.in`).
 Next.js 16 (App Router) · TypeScript · Tailwind CSS v4 · deployed to **Vercel**.
 
-Talks to `marvels-api` (`api.marvelsonline.in`) over HTTPS; media served from
-`media.marvelsonline.in`. Full spec: [`../docs/BUILD_BRIEF.md`](../docs/BUILD_BRIEF.md).
+Talks to `marvels-api` (`api.marvelsazamgarh.in`) over HTTPS; media served from
+`media.marvelsazamgarh.in`. Full spec: [`../docs/BUILD_BRIEF.md`](../docs/BUILD_BRIEF.md).
 
 ## Getting started
 

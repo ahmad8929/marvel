@@ -13,7 +13,7 @@ const FALLBACK_SETTINGS: PublicSettings = {
   handlingFee: 0,
   handlingFeeLabel: "Handling charges",
   taxNote: "Prices are inclusive of all taxes",
-  supportEmail: "support@marvelsonline.in",
+  supportEmail: "support@marvelsazamgarh.in",
   supportPhone: "",
   instagramUrl: null,
   facebookUrl: null,
