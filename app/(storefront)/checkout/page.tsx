@@ -9,6 +9,7 @@ import { inr } from "@/lib/format";
 import type { Address, CartQuote } from "@/lib/types";
 import { Container, Button, Input, Label } from "@/components/ui";
 import { PriceBreakdown } from "@/components/storefront/PriceBreakdown";
+import { AuthModal } from "@/components/storefront/AuthModal";
 
 const API = process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:3001/api/v1";
 const CF_MODE =
@@ -32,6 +33,7 @@ function CheckoutInner() {
   const [method, setMethod] = useState<"CASHFREE" | "COD">("CASHFREE");
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [authOpen, setAuthOpen] = useState(false);
 
   const [email, setEmail] = useState("");
   const [phone, setPhone] = useState("");
@@ -50,6 +52,14 @@ function CheckoutInner() {
     () => lines.map((l) => ({ variantId: l.variantId, qty: l.qty })),
     [lines],
   );
+
+  // Require a signed-in customer to place an order.
+  useEffect(() => {
+    /* eslint-disable react-hooks/set-state-in-effect */
+    if (ready && !user && lines.length > 0) setAuthOpen(true);
+    if (user) setAuthOpen(false);
+    /* eslint-enable react-hooks/set-state-in-effect */
+  }, [ready, user, lines.length]);
 
   // Prefill contact + saved addresses for signed-in users.
   useEffect(() => {
@@ -120,6 +130,10 @@ function CheckoutInner() {
 
   async function placeOrder(e: React.FormEvent) {
     e.preventDefault();
+    if (!user) {
+      setAuthOpen(true);
+      return;
+    }
     setError(null);
     setBusy(true);
     const payload = {
@@ -138,13 +152,16 @@ function CheckoutInner() {
     };
     try {
       const endpoint = method === "COD" ? "/checkout/cod" : "/checkout";
-      const res = await fetch(`${API}${endpoint}`, {
+      const res = await authFetch(endpoint, {
         method: "POST",
         headers: { "content-type": "application/json" },
-        credentials: "include",
         body: JSON.stringify(payload),
       });
       const data = await res.json();
+      if (res.status === 401) {
+        setAuthOpen(true);
+        return;
+      }
       if (!res.ok) throw new Error(data?.error?.message ?? "Could not place order");
 
       if (method === "COD") {
@@ -201,14 +218,17 @@ function CheckoutInner() {
       </h1>
       <form onSubmit={placeOrder} className="grid gap-12 lg:grid-cols-[1fr_380px]">
         <div className="space-y-10">
-          {!user && (
-            <p className="border border-line bg-surface p-3 text-sm text-muted">
-              Checking out as a guest.{" "}
-              <a href="/login?next=/checkout" className="text-primary underline">
+          {ready && !user && (
+            <div className="flex items-center justify-between gap-3 border border-primary/30 bg-blush/40 p-4 text-sm">
+              <span className="text-ink">Please sign in to place your order.</span>
+              <button
+                type="button"
+                onClick={() => setAuthOpen(true)}
+                className="shrink-0 bg-primary px-4 py-2 text-xs font-medium uppercase tracking-[0.12em] text-bg"
+              >
                 Sign in
-              </a>{" "}
-              for saved addresses and order history.
-            </p>
+              </button>
+            </div>
           )}
 
           <fieldset className="space-y-3">
@@ -381,12 +401,21 @@ function CheckoutInner() {
           <Button type="submit" size="lg" className="mt-6 w-full rounded-none" disabled={busy}>
             {busy
               ? "Processing…"
-              : method === "COD"
-                ? `Place order · ${quote ? inr(quote.total) : ""}`
-                : `Pay ${quote ? inr(quote.total) : "now"}`}
+              : !user
+                ? "Sign in to place order"
+                : method === "COD"
+                  ? `Place order · ${quote ? inr(quote.total) : ""}`
+                  : `Pay ${quote ? inr(quote.total) : "now"}`}
           </Button>
         </aside>
       </form>
+
+      <AuthModal
+        open={authOpen}
+        onClose={() => setAuthOpen(false)}
+        onSuccess={() => setAuthOpen(false)}
+        reason="Sign in or create an account to place your order"
+      />
     </Container>
   );
 }

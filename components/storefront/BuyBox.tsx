@@ -82,14 +82,11 @@ export function BuyBox({ product }: { product: ProductDetail }) {
   }
 
   return (
-    <div className="space-y-6">
-      {/* coupon nudge */}
-      <CouponNudge />
-
+    <div className="space-y-5">
       {colours.length > 1 && (
         <div>
-          <p className="mb-2 text-sm font-medium">
-            Colour: <span className="text-muted">{color}</span>
+          <p className="mb-2 text-xs uppercase tracking-[0.12em] text-muted">
+            Colour — <span className="text-ink">{color}</span>
           </p>
           <div className="flex flex-wrap gap-2">
             {colours.map((c) => (
@@ -98,7 +95,7 @@ export function BuyBox({ product }: { product: ProductDetail }) {
                 onClick={() => setColor(c.name)}
                 aria-pressed={c.name === color}
                 title={c.name}
-                className={`h-9 w-9 rounded-full border-2 ${
+                className={`h-8 w-8 rounded-full border-2 ${
                   c.name === color ? "border-primary" : "border-line"
                 }`}
                 style={{ background: c.hex ?? "#ccc" }}
@@ -110,7 +107,7 @@ export function BuyBox({ product }: { product: ProductDetail }) {
 
       <div ref={sizeRowRef}>
         <div className="mb-2 flex items-center justify-between">
-          <p className="text-sm font-medium">Size</p>
+          <p className="text-xs uppercase tracking-[0.12em] text-muted">Size</p>
           <Link href="/size-guide" className="text-xs text-primary underline underline-offset-2">
             Size guide
           </Link>
@@ -143,45 +140,47 @@ export function BuyBox({ product }: { product: ProductDetail }) {
         )}
       </div>
 
-      <div ref={ctaRef} className="flex gap-3">
-        <button
-          onClick={() => addToCart()}
-          disabled={soldOut}
-          className="flex-1 bg-primary py-3.5 text-xs font-medium uppercase tracking-[0.16em] text-bg hover:bg-primary-hover disabled:opacity-50"
-        >
-          {soldOut ? "Sold out" : added ? "✓ Added to bag" : "Add to bag"}
-        </button>
-        <div className="grid w-12 place-items-center border border-line">
-          <WishlistButton productId={product.id} className="bg-transparent shadow-none" />
+      <div ref={ctaRef} className="space-y-3 pt-1">
+        <div className="flex gap-3">
+          <button
+            onClick={() => addToCart()}
+            disabled={soldOut}
+            className="flex-1 bg-primary py-3.5 text-xs font-medium uppercase tracking-[0.18em] text-bg hover:bg-primary-hover disabled:opacity-50"
+          >
+            {soldOut ? "Sold out" : added ? "✓ Added to bag" : "Add to bag"}
+          </button>
+          <div className="grid w-12 place-items-center border border-line">
+            <WishlistButton productId={product.id} className="bg-transparent shadow-none" />
+          </div>
         </div>
+        <button
+          disabled={soldOut}
+          onClick={() => {
+            if (addToCart(false)) router.push("/checkout");
+          }}
+          className="w-full border border-primary py-3.5 text-xs font-medium uppercase tracking-[0.18em] text-primary hover:bg-blush disabled:opacity-50"
+        >
+          Buy it now
+        </button>
       </div>
 
-      <button
-        disabled={soldOut}
-        onClick={() => {
-          if (addToCart(false)) router.push("/checkout");
-        }}
-        className="w-full border border-primary py-3.5 text-xs font-medium uppercase tracking-[0.16em] text-primary hover:bg-blush disabled:opacity-50"
-      >
-        Buy it now
-      </button>
+      {/* quiet coupon line */}
+      <CouponNudge />
 
-      {/* trust row */}
-      <div className="grid grid-cols-3 gap-2 border-y border-line py-3 text-center text-[0.65rem] uppercase tracking-[0.1em] text-muted">
-        <span className="flex flex-col items-center gap-1">
-          <ShieldCheck className="h-4 w-4 text-gold" /> Secure checkout
+      {/* trust + delivery, understated */}
+      <div className="flex flex-wrap items-center gap-x-4 gap-y-1 border-t border-line pt-3 text-[0.7rem] text-muted">
+        <span className="flex items-center gap-1">
+          <ShieldCheck className="h-3.5 w-3.5 text-gold" /> Secure checkout
         </span>
-        <span className="flex flex-col items-center gap-1">
-          <Truck className="h-4 w-4 text-gold" /> COD available
+        <span className="flex items-center gap-1">
+          <Truck className="h-3.5 w-3.5 text-gold" /> Cash on delivery
         </span>
-        <span className="flex flex-col items-center gap-1">
-          <RefreshCcw className="h-4 w-4 text-gold" /> 7-day returns
+        <span className="flex items-center gap-1">
+          <RefreshCcw className="h-3.5 w-3.5 text-gold" /> 7-day easy returns
         </span>
       </div>
 
-      <div className="border border-line bg-surface p-4 text-sm text-muted">
-        <PincodeCheck />
-      </div>
+      <PincodeCheck />
 
       {/* sticky mobile CTA */}
       {showSticky && !soldOut && (
@@ -217,15 +216,16 @@ function CouponNudge() {
           () => undefined,
         );
       }}
-      className="flex w-full items-center justify-between border border-dashed border-gold bg-gold/10 px-3 py-2 text-xs"
+      className="flex items-center gap-1.5 text-xs text-muted hover:text-primary"
     >
-      <span className="text-ink">
-        Use code <strong>WELCOME10</strong> for 10% off your first order
-      </span>
-      <span className="flex items-center gap-1 text-primary">
-        {copied ? <Check className="h-3.5 w-3.5" /> : <Copy className="h-3.5 w-3.5" />}
-        {copied ? "Copied" : "Copy"}
-      </span>
+      {copied ? <Check className="h-3.5 w-3.5 text-primary" /> : <Copy className="h-3.5 w-3.5" />}
+      {copied ? (
+        "Code copied"
+      ) : (
+        <span>
+          Get 10% off with code <span className="font-medium text-ink">WELCOME10</span>
+        </span>
+      )}
     </button>
   );
 }
