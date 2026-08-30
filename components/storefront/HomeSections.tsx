@@ -28,6 +28,7 @@ export function UspBar() {
 /* ---------------- category tiles (Libas-style, full-bleed) ---------------- */
 export function CategoryTiles({ categories }: { categories: Category[] }) {
   const tiles = categories.slice(0, 4);
+  if (tiles.length === 0) return null;
   return (
     <section className="grid grid-cols-2 lg:grid-cols-4">
       {tiles.map((c) => (

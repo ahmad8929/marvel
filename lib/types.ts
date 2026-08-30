@@ -107,6 +107,11 @@ export type PublicSettings = {
   flatShipFee: number;
   codEnabled: boolean;
   codFee: number;
+  platformFee: number;
+  platformFeeLabel: string;
+  handlingFee: number;
+  handlingFeeLabel: string;
+  taxNote: string;
   supportEmail: string;
   supportPhone: string;
   instagramUrl: string | null;

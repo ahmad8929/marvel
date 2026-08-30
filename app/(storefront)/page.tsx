@@ -21,10 +21,23 @@ export const metadata: Metadata = {
     "Shop women's kurtis, dresses and co-ord sets at Marvel's Online Clothings. Elegant. Feminine. Effortless.",
 };
 
-export const revalidate = 3600;
+// Short revalidate so the page fills in once the API is reachable, even if the
+// first (build-time) fetch fails because the API isn't deployed yet.
+export const revalidate = 120;
+
+const EMPTY_HOME: HomeContent = {
+  slides: [],
+  testimonials: [],
+  categories: [],
+  newArrivals: [],
+  announcementText: "",
+  announcementHref: null,
+};
 
 export default async function HomePage() {
-  const home = await apiGet<HomeContent>("/content/home", { tags: ["home"] });
+  const home = await apiGet<HomeContent>("/content/home", {
+    tags: ["home"],
+  }).catch(() => EMPTY_HOME);
 
   return (
     <>
@@ -35,26 +48,28 @@ export default async function HomePage() {
       <CategoryTiles categories={home.categories} />
 
       {/* New arrivals */}
-      <Container className="py-16">
-        <div className="mb-8 text-center">
-          <h2 className="font-display text-2xl uppercase tracking-[0.2em] text-primary">
-            New Arrivals
-          </h2>
-          <Link
-            href="/collections/kurtis?sort=newest"
-            className="mt-2 inline-block text-xs uppercase tracking-[0.16em] text-primary underline underline-offset-4"
-          >
-            View all
-          </Link>
-        </div>
-        <Row>
-          {home.newArrivals.map((p) => (
-            <div key={p.id} className="w-[240px] shrink-0 snap-start">
-              <ProductCard product={p} />
-            </div>
-          ))}
-        </Row>
-      </Container>
+      {home.newArrivals.length > 0 && (
+        <Container className="py-16">
+          <div className="mb-8 text-center">
+            <h2 className="font-display text-2xl uppercase tracking-[0.2em] text-primary">
+              New Arrivals
+            </h2>
+            <Link
+              href="/collections/kurtis?sort=newest"
+              className="mt-2 inline-block text-xs uppercase tracking-[0.16em] text-primary underline underline-offset-4"
+            >
+              View all
+            </Link>
+          </div>
+          <Row>
+            {home.newArrivals.map((p) => (
+              <div key={p.id} className="w-[240px] shrink-0 snap-start">
+                <ProductCard product={p} />
+              </div>
+            ))}
+          </Row>
+        </Container>
+      )}
 
       {/* Editorial banner */}
       <section className="relative aspect-[16/9] w-full overflow-hidden bg-blush/40 sm:aspect-[3/1]">
