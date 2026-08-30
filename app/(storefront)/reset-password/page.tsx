@@ -3,7 +3,7 @@
 import { Suspense, useState } from "react";
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
-import { Container, Button, Input, Label } from "@/components/ui";
+import { Container, Button, Label, PasswordInput } from "@/components/ui";
 
 function ResetInner() {
   const params = useSearchParams();
@@ -40,9 +40,8 @@ function ResetInner() {
           <form onSubmit={submit} className="mt-6 space-y-4">
             <div>
               <Label htmlFor="password">New password</Label>
-              <Input
+              <PasswordInput
                 id="password"
-                type="password"
                 required
                 minLength={8}
                 value={password}

@@ -3,7 +3,7 @@
 import { useState } from "react";
 import { X } from "lucide-react";
 import { useAuth } from "@/lib/auth-client";
-import { Button, Input, Label } from "@/components/ui";
+import { Button, Input, Label, PasswordInput } from "@/components/ui";
 import { LogoMark } from "@/components/brand/Logo";
 
 /** Inline sign-in / create-account used at checkout so the cart isn't lost. */
@@ -102,9 +102,8 @@ export function AuthModal({
           </div>
           <div>
             <Label htmlFor="am-password">Password</Label>
-            <Input
+            <PasswordInput
               id="am-password"
-              type="password"
               required
               minLength={8}
               value={form.password}

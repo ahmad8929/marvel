@@ -4,6 +4,9 @@ const nextConfig: NextConfig = {
   images: {
     remotePatterns: [
       { protocol: "https", hostname: "media.marvelsonline.in" },
+      // API-served media (until the media.marvelsonline.in subdomain is live)
+      { protocol: "https", hostname: "orangered-badger-607568.hostingersite.com" },
+      { protocol: "https", hostname: "**.hostingersite.com" },
       { protocol: "https", hostname: "placehold.co" },
       { protocol: "https", hostname: "picsum.photos" },
       { protocol: "https", hostname: "fastly.picsum.photos" },

@@ -138,6 +138,8 @@ export const Input = forwardRef<
 ));
 Input.displayName = "Input";
 
+export { PasswordInput } from "./PasswordInput";
+
 export const Label = ({
   className,
   ...props

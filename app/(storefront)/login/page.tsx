@@ -4,7 +4,7 @@ import { Suspense, useState } from "react";
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useAuth } from "@/lib/auth-client";
-import { Container, Button, Input, Label } from "@/components/ui";
+import { Container, Button, Input, Label, PasswordInput } from "@/components/ui";
 
 function LoginInner() {
   const { login } = useAuth();
@@ -41,7 +41,7 @@ function LoginInner() {
           </div>
           <div>
             <Label htmlFor="password">Password</Label>
-            <Input id="password" type="password" required value={password} onChange={(e) => setPassword(e.target.value)} />
+            <PasswordInput id="password" required value={password} onChange={(e) => setPassword(e.target.value)} />
           </div>
           {error && <p className="text-sm text-sale">{error}</p>}
           <Button type="submit" className="w-full" disabled={busy}>

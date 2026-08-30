@@ -4,7 +4,7 @@ import { useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useAuth } from "@/lib/auth-client";
-import { Container, Button, Input, Label } from "@/components/ui";
+import { Container, Button, Input, Label, PasswordInput } from "@/components/ui";
 
 export default function RegisterPage() {
   const { register } = useAuth();
@@ -43,7 +43,7 @@ export default function RegisterPage() {
           </div>
           <div>
             <Label htmlFor="password">Password</Label>
-            <Input id="password" type="password" required minLength={8} value={form.password} onChange={(e) => setForm((f) => ({ ...f, password: e.target.value }))} />
+            <PasswordInput id="password" required minLength={8} value={form.password} onChange={(e) => setForm((f) => ({ ...f, password: e.target.value }))} />
             <p className="mt-1 text-xs text-muted">At least 8 characters.</p>
           </div>
           {error && <p className="text-sm text-sale">{error}</p>}
