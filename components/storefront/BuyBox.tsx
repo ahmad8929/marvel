@@ -5,12 +5,14 @@ import { useRouter } from "next/navigation";
 import { Check } from "lucide-react";
 import type { ProductDetail } from "@/lib/types";
 import { useCart } from "@/stores/cart";
+import { useUI } from "@/stores/ui";
 import { Button } from "@/components/ui";
 import { WishlistButton } from "./WishlistButton";
 
 export function BuyBox({ product }: { product: ProductDetail }) {
   const router = useRouter();
   const add = useCart((s) => s.add);
+  const openCart = useUI((s) => s.openCart);
   const colours = product.colours;
   const [color, setColor] = useState(colours[0]?.name ?? "");
   const [size, setSize] = useState<string>("");
@@ -44,6 +46,7 @@ export function BuyBox({ product }: { product: ProductDetail }) {
       1,
     );
     setAdded(true);
+    openCart();
     setTimeout(() => setAdded(false), 1800);
   }
 

@@ -11,17 +11,17 @@ type ButtonProps = React.ButtonHTMLAttributes<HTMLButtonElement> & {
 };
 
 const buttonBase =
-  "inline-flex items-center justify-center gap-2 rounded-full font-medium transition-colors disabled:opacity-50 disabled:pointer-events-none focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/50";
+  "inline-flex items-center justify-center gap-2 font-medium uppercase tracking-[0.12em] transition-colors disabled:opacity-50 disabled:pointer-events-none focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/50";
 const buttonVariants: Record<string, string> = {
   primary: "bg-primary text-bg hover:bg-primary-hover",
-  outline: "border border-primary/30 text-primary hover:bg-blush",
+  outline: "border border-primary/40 text-primary hover:bg-blush",
   ghost: "text-ink hover:bg-blush",
   gold: "bg-gold text-bg hover:brightness-95",
 };
 const buttonSizes: Record<string, string> = {
-  sm: "h-9 px-4 text-sm",
-  md: "h-11 px-6 text-sm",
-  lg: "h-12 px-8 text-base",
+  sm: "h-9 px-4 text-xs",
+  md: "h-11 px-6 text-xs",
+  lg: "h-12 px-8 text-sm",
 };
 
 export const Button = forwardRef<HTMLButtonElement, ButtonProps>(
@@ -130,7 +130,7 @@ export const Input = forwardRef<
   <input
     ref={ref}
     className={cn(
-      "h-11 w-full rounded-lg border border-line bg-surface px-3.5 text-sm text-ink placeholder:text-muted focus-visible:border-primary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/20",
+      "h-11 w-full rounded-sm border border-line bg-surface px-3.5 text-sm text-ink placeholder:text-muted focus-visible:border-primary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/20",
       className,
     )}
     {...props}

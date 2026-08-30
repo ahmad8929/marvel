@@ -129,3 +129,41 @@ export type SessionUser = {
   email: string;
   role: "CUSTOMER" | "STAFF" | "ADMIN";
 };
+
+export type CartQuote = {
+  lines: {
+    variantId: string;
+    title: string;
+    slug: string;
+    size: string;
+    color: string;
+    image: string;
+    unitPrice: number;
+    qty: number;
+    lineTotal: number;
+  }[];
+  subtotal: number;
+  discount: number;
+  shippingFee: number;
+  platformFee: number;
+  handlingFee: number;
+  codFee: number;
+  total: number;
+  couponApplied: boolean;
+  couponMessage: string | null;
+  labels: { platformFee: string; handlingFee: string; cod: string; shipping: string };
+  freeShipThreshold: number;
+  taxNote: string;
+};
+
+export type Address = {
+  id: string;
+  fullName: string;
+  phone: string;
+  line1: string;
+  line2: string | null;
+  city: string;
+  state: string;
+  pincode: string;
+  isDefault: boolean;
+};

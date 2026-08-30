@@ -3,21 +3,22 @@
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { Menu, Search, ShoppingBag, User, X } from "lucide-react";
+import { ChevronRight, Heart, Search, ShoppingBag, User, X } from "lucide-react";
 import { Container } from "@/components/ui";
 import { Logo } from "@/components/brand/Logo";
 import { useCart } from "@/stores/cart";
+import { useUI } from "@/stores/ui";
 import { useAuth } from "@/lib/auth-client";
+import { NAV_GROUPS } from "@/lib/nav";
 import type { Category } from "@/lib/types";
 import { CartDrawer } from "./CartDrawer";
 
 export function Header({
-  categories,
   announcement,
   announcementHref,
   freeShipThreshold,
 }: {
-  categories: Category[];
+  categories?: Category[];
   announcement: string;
   announcementHref: string | null;
   freeShipThreshold: number;
@@ -25,31 +26,30 @@ export function Header({
   const router = useRouter();
   const { user } = useAuth();
   const count = useCart((s) => s.lines.reduce((n, l) => n + l.qty, 0));
-  const [cartOpen, setCartOpen] = useState(false);
-  const [mobileOpen, setMobileOpen] = useState(false);
+  const { cartOpen, openCart, closeCart, navOpen, setNavOpen } = useUI();
   const [searchOpen, setSearchOpen] = useState(false);
   const [q, setQ] = useState("");
-  const [scrolled, setScrolled] = useState(false);
 
   useEffect(() => {
-    const onScroll = () => setScrolled(window.scrollY > 8);
-    onScroll();
-    window.addEventListener("scroll", onScroll);
-    return () => window.removeEventListener("scroll", onScroll);
-  }, []);
+    const open = navOpen || searchOpen;
+    document.body.style.overflow = open ? "hidden" : "";
+    return () => {
+      document.body.style.overflow = "";
+    };
+  }, [navOpen, searchOpen]);
 
   function submitSearch(e: React.FormEvent) {
     e.preventDefault();
     if (!q.trim()) return;
     setSearchOpen(false);
-    setMobileOpen(false);
+    setNavOpen(false);
     router.push(`/search?q=${encodeURIComponent(q.trim())}`);
   }
 
   return (
     <>
       {announcement && (
-        <div className="bg-primary text-center text-xs text-bg">
+        <div className="bg-primary text-center text-[0.7rem] uppercase tracking-[0.18em] text-bg">
           <Container className="py-2">
             {announcementHref ? (
               <Link href={announcementHref}>{announcement}</Link>
@@ -60,138 +60,170 @@ export function Header({
         </div>
       )}
 
-      <header
-        className={`sticky top-0 z-40 border-b border-line bg-bg/95 backdrop-blur transition-shadow ${scrolled ? "shadow-sm" : ""}`}
-      >
-        <Container className="flex h-16 items-center justify-between gap-4">
-          <div className="flex items-center gap-2 lg:hidden">
-            <button onClick={() => setMobileOpen(true)} aria-label="Open menu" className="p-1">
-              <Menu className="h-6 w-6" />
+      <header className="sticky top-0 z-40 border-b border-line bg-surface">
+        <Container className="grid h-16 grid-cols-[1fr_auto_1fr] items-center gap-4">
+          {/* left */}
+          <div className="flex items-center gap-5">
+            <button
+              onClick={() => setNavOpen(true)}
+              className="flex items-center gap-2 text-xs font-medium uppercase tracking-[0.16em] text-ink hover:text-primary"
+            >
+              <span className="flex flex-col gap-[3px]">
+                <span className="block h-px w-4 bg-current" />
+                <span className="block h-px w-4 bg-current" />
+                <span className="block h-px w-4 bg-current" />
+              </span>
+              <span className="hidden sm:inline">Menu</span>
+            </button>
+            <button
+              onClick={() => setSearchOpen(true)}
+              className="flex items-center gap-2 text-xs font-medium uppercase tracking-[0.16em] text-ink hover:text-primary"
+            >
+              <Search className="h-4 w-4" />
+              <span className="hidden sm:inline">Search</span>
             </button>
           </div>
 
-          <Link href="/" aria-label="Marvel's Online Clothings — home">
+          {/* center */}
+          <Link href="/" aria-label="Marvel's Online Clothings — home" className="justify-self-center">
             <Logo />
           </Link>
 
-          <nav className="hidden items-center gap-7 lg:flex" aria-label="Primary">
-            {categories.map((c) => (
-              <Link
-                key={c.id}
-                href={`/collections/${c.slug}`}
-                className="text-sm font-medium text-ink hover:text-primary"
-              >
-                {c.name}
-              </Link>
-            ))}
+          {/* right */}
+          <div className="flex items-center justify-end gap-4">
             <Link
-              href="/collections/kurtis?sort=newest"
-              className="text-sm font-medium text-primary"
+              href="/contact"
+              className="hidden text-xs font-medium uppercase tracking-[0.16em] text-ink hover:text-primary md:inline"
             >
-              New In
+              Contact Us
             </Link>
-          </nav>
-
-          <div className="flex items-center gap-1 sm:gap-2">
-            <button
-              onClick={() => setSearchOpen((v) => !v)}
-              aria-label="Search"
-              className="rounded-full p-2 hover:bg-blush"
-            >
-              <Search className="h-5 w-5" />
-            </button>
-            <Link
-              href={user ? "/account" : "/login"}
-              aria-label={user ? "Account" : "Sign in"}
-              className="rounded-full p-2 hover:bg-blush"
-            >
-              <User className="h-5 w-5" />
+            <Link href={user ? "/account" : "/login"} aria-label={user ? "Account" : "Sign in"}>
+              <User className="h-5 w-5 text-ink hover:text-primary" />
             </Link>
-            <button
-              onClick={() => setCartOpen(true)}
-              aria-label="Open bag"
-              className="relative rounded-full p-2 hover:bg-blush"
-            >
-              <ShoppingBag className="h-5 w-5" />
+            <Link href="/account/wishlist" aria-label="Wishlist">
+              <Heart className="h-5 w-5 text-ink hover:text-primary" />
+            </Link>
+            <button onClick={openCart} aria-label="Open bag" className="relative">
+              <ShoppingBag className="h-5 w-5 text-ink hover:text-primary" />
               {count > 0 && (
-                <span className="absolute -right-0.5 -top-0.5 grid h-4 w-4 place-items-center rounded-full bg-primary text-[10px] text-bg">
+                <span className="absolute -right-2 -top-2 grid h-4 w-4 place-items-center rounded-full bg-primary text-[10px] text-bg">
                   {count}
                 </span>
               )}
             </button>
           </div>
         </Container>
+      </header>
 
-        {searchOpen && (
-          <div className="border-t border-line bg-bg">
-            <Container className="py-3">
-              <form onSubmit={submitSearch} className="flex gap-2">
+      {/* MENU drawer */}
+      {navOpen && (
+        <div className="fixed inset-0 z-50">
+          <div className="absolute inset-0 bg-ink/40" onClick={() => setNavOpen(false)} />
+          <nav className="absolute left-0 top-0 flex h-full w-[88%] max-w-sm flex-col overflow-y-auto bg-bg">
+            <div className="flex items-center justify-between border-b border-line px-5 py-4">
+              <span className="text-xs font-medium uppercase tracking-[0.2em] text-primary">Menu</span>
+              <button onClick={() => setNavOpen(false)} aria-label="Close">
+                <X className="h-5 w-5" />
+              </button>
+            </div>
+
+            <div className="flex-1 px-5 py-4">
+              <Link
+                href="/collections/kurtis?sort=newest"
+                onClick={() => setNavOpen(false)}
+                className="mb-4 block text-sm font-medium uppercase tracking-[0.14em] text-primary"
+              >
+                New In
+              </Link>
+              {NAV_GROUPS.map((g) => (
+                <details key={g.slug} className="border-t border-line py-1">
+                  <summary className="flex cursor-pointer list-none items-center justify-between py-3 text-sm font-medium uppercase tracking-[0.12em]">
+                    {g.title}
+                    <ChevronRight className="h-4 w-4 transition-transform [details[open]>summary_&]:rotate-90" />
+                  </summary>
+                  <ul className="pb-3 pl-1">
+                    <li>
+                      <Link
+                        href={`/collections/${g.slug}`}
+                        onClick={() => setNavOpen(false)}
+                        className="block py-1.5 text-sm text-primary"
+                      >
+                        Shop all {g.title}
+                      </Link>
+                    </li>
+                    {g.links.map((l) => (
+                      <li key={l.href}>
+                        <Link
+                          href={l.href}
+                          onClick={() => setNavOpen(false)}
+                          className="block py-1.5 text-sm text-muted hover:text-ink"
+                        >
+                          {l.label}
+                        </Link>
+                      </li>
+                    ))}
+                  </ul>
+                </details>
+              ))}
+              <div className="mt-4 space-y-2 border-t border-line pt-4 text-sm">
+                <Link href={user ? "/account" : "/login"} onClick={() => setNavOpen(false)} className="block py-1">
+                  {user ? "My account" : "Sign in / Register"}
+                </Link>
+                <Link href="/track-order" onClick={() => setNavOpen(false)} className="block py-1">
+                  Track order
+                </Link>
+                <Link href="/pages/returns-refunds" onClick={() => setNavOpen(false)} className="block py-1">
+                  Returns &amp; exchanges
+                </Link>
+                <Link href="/contact" onClick={() => setNavOpen(false)} className="block py-1">
+                  Contact us
+                </Link>
+              </div>
+            </div>
+          </nav>
+        </div>
+      )}
+
+      {/* SEARCH overlay */}
+      {searchOpen && (
+        <div className="fixed inset-0 z-50">
+          <div className="absolute inset-0 bg-ink/40" onClick={() => setSearchOpen(false)} />
+          <div className="absolute inset-x-0 top-0 bg-bg p-6">
+            <Container>
+              <form onSubmit={submitSearch} className="flex items-center gap-3 border-b border-primary pb-3">
+                <Search className="h-5 w-5 text-muted" />
                 <input
                   autoFocus
                   value={q}
                   onChange={(e) => setQ(e.target.value)}
-                  placeholder="Search kurtis, dresses, co-ords…"
-                  className="h-11 w-full rounded-lg border border-line bg-surface px-4 text-sm focus:border-primary focus:outline-none"
+                  placeholder="Search for kurtis, dresses, co-ord sets…"
+                  className="flex-1 bg-transparent text-lg outline-none placeholder:text-muted"
                 />
-                <button type="submit" className="rounded-lg bg-primary px-5 text-sm text-bg">
-                  Search
+                <button type="button" onClick={() => setSearchOpen(false)} aria-label="Close">
+                  <X className="h-5 w-5" />
                 </button>
               </form>
+              <div className="mt-4 flex flex-wrap gap-2 text-xs">
+                {["New In", "Cotton Kurtis", "Co-ord Sets", "Maxi Dresses", "Festive"].map((t) => (
+                  <button
+                    key={t}
+                    onClick={() => {
+                      setQ(t);
+                      router.push(`/search?q=${encodeURIComponent(t)}`);
+                      setSearchOpen(false);
+                    }}
+                    className="rounded-full border border-line px-3 py-1 hover:border-primary hover:text-primary"
+                  >
+                    {t}
+                  </button>
+                ))}
+              </div>
             </Container>
-          </div>
-        )}
-      </header>
-
-      {/* Mobile menu */}
-      {mobileOpen && (
-        <div className="fixed inset-0 z-50 lg:hidden">
-          <div className="absolute inset-0 bg-ink/40" onClick={() => setMobileOpen(false)} />
-          <div className="absolute left-0 top-0 h-full w-4/5 max-w-xs bg-bg p-5">
-            <div className="mb-6 flex items-center justify-between">
-              <Logo />
-              <button onClick={() => setMobileOpen(false)} aria-label="Close">
-                <X className="h-6 w-6" />
-              </button>
-            </div>
-            <form onSubmit={submitSearch} className="mb-6">
-              <input
-                value={q}
-                onChange={(e) => setQ(e.target.value)}
-                placeholder="Search…"
-                className="h-11 w-full rounded-lg border border-line bg-surface px-4 text-sm"
-              />
-            </form>
-            <nav className="flex flex-col gap-1">
-              {categories.map((c) => (
-                <Link
-                  key={c.id}
-                  href={`/collections/${c.slug}`}
-                  onClick={() => setMobileOpen(false)}
-                  className="rounded-lg px-3 py-3 text-sm font-medium hover:bg-blush"
-                >
-                  {c.name}
-                </Link>
-              ))}
-              <Link href="/collections/kurtis?sort=newest" onClick={() => setMobileOpen(false)} className="rounded-lg px-3 py-3 text-sm font-medium text-primary hover:bg-blush">
-                New In
-              </Link>
-              <hr className="my-2 border-line" />
-              <Link href={user ? "/account" : "/login"} onClick={() => setMobileOpen(false)} className="rounded-lg px-3 py-3 text-sm hover:bg-blush">
-                {user ? "My account" : "Sign in"}
-              </Link>
-              <Link href="/track-order" onClick={() => setMobileOpen(false)} className="rounded-lg px-3 py-3 text-sm hover:bg-blush">
-                Track order
-              </Link>
-            </nav>
           </div>
         </div>
       )}
 
-      <CartDrawer
-        open={cartOpen}
-        onClose={() => setCartOpen(false)}
-        freeShipThreshold={freeShipThreshold}
-      />
+      <CartDrawer open={cartOpen} onClose={closeCart} freeShipThreshold={freeShipThreshold} />
     </>
   );
 }

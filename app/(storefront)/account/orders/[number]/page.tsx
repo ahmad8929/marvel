@@ -14,6 +14,8 @@ type OrderDetail = {
   discount: number;
   shippingFee: number;
   codFee: number;
+  platformFee: number;
+  handlingFee: number;
   total: number;
   couponCode: string | null;
   trackingCarrier: string | null;
@@ -136,6 +138,18 @@ export default function OrderDetailPage({
               <dt>Shipping</dt>
               <dd>{order.shippingFee === 0 ? "Free" : inr(order.shippingFee)}</dd>
             </div>
+            {order.platformFee > 0 && (
+              <div className="flex justify-between">
+                <dt>Platform fee</dt>
+                <dd>{inr(order.platformFee)}</dd>
+              </div>
+            )}
+            {order.handlingFee > 0 && (
+              <div className="flex justify-between">
+                <dt>Handling charges</dt>
+                <dd>{inr(order.handlingFee)}</dd>
+              </div>
+            )}
             {order.codFee > 0 && (
               <div className="flex justify-between">
                 <dt>COD fee</dt>
