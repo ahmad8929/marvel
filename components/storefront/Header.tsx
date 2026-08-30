@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { ChevronRight, Heart, Search, ShoppingBag, User, X } from "lucide-react";
@@ -93,13 +93,11 @@ export function Header({
           <div className="flex items-center justify-end gap-4">
             <Link
               href="/contact"
-              className="hidden text-xs font-medium uppercase tracking-[0.16em] text-ink hover:text-primary md:inline"
+              className="hidden text-xs font-medium uppercase tracking-[0.16em] text-ink hover:text-primary lg:inline"
             >
               Contact Us
             </Link>
-            <Link href={user ? "/account" : "/login"} aria-label={user ? "Account" : "Sign in"}>
-              <User className="h-5 w-5 text-ink hover:text-primary" />
-            </Link>
+            <AccountMenu />
             <Link href="/account/wishlist" aria-label="Wishlist">
               <Heart className="h-5 w-5 text-ink hover:text-primary" />
             </Link>
@@ -225,5 +223,82 @@ export function Header({
 
       <CartDrawer open={cartOpen} onClose={closeCart} freeShipThreshold={freeShipThreshold} />
     </>
+  );
+}
+
+function AccountMenu() {
+  const { user, ready, logout } = useAuth();
+  const [open, setOpen] = useState(false);
+  const ref = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    function onDoc(e: MouseEvent) {
+      if (ref.current && !ref.current.contains(e.target as Node)) setOpen(false);
+    }
+    document.addEventListener("mousedown", onDoc);
+    return () => document.removeEventListener("mousedown", onDoc);
+  }, []);
+
+  if (ready && !user) {
+    return (
+      <Link
+        href="/login"
+        className="flex items-center gap-1.5 text-ink hover:text-primary"
+        aria-label="Sign in"
+      >
+        <User className="h-5 w-5" />
+        <span className="hidden text-xs font-medium uppercase tracking-[0.14em] sm:inline">
+          Sign In
+        </span>
+      </Link>
+    );
+  }
+
+  return (
+    <div ref={ref} className="relative">
+      <button
+        onClick={() => setOpen((v) => !v)}
+        className="flex items-center gap-1.5 text-ink hover:text-primary"
+        aria-haspopup="menu"
+        aria-expanded={open}
+      >
+        <User className="h-5 w-5" />
+        <span className="hidden max-w-[90px] truncate text-xs font-medium uppercase tracking-[0.12em] sm:inline">
+          {user?.name?.split(" ")[0] ?? "Account"}
+        </span>
+      </button>
+      {open && (
+        <div
+          role="menu"
+          className="absolute right-0 top-full z-50 mt-2 w-48 border border-line bg-surface py-1 text-sm shadow-lg"
+        >
+          <p className="px-4 py-2 text-xs text-muted">{user?.email}</p>
+          {[
+            ["/account", "My account"],
+            ["/account/orders", "My orders"],
+            ["/account/addresses", "Addresses"],
+            ["/account/wishlist", "Wishlist"],
+          ].map(([href, label]) => (
+            <Link
+              key={href}
+              href={href}
+              onClick={() => setOpen(false)}
+              className="block px-4 py-2 hover:bg-blush"
+            >
+              {label}
+            </Link>
+          ))}
+          <button
+            onClick={() => {
+              setOpen(false);
+              void logout();
+            }}
+            className="block w-full px-4 py-2 text-left text-primary hover:bg-blush"
+          >
+            Sign out
+          </button>
+        </div>
+      )}
+    </div>
   );
 }

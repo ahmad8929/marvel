@@ -3,6 +3,28 @@ import Image from "next/image";
 import { Container } from "@/components/ui";
 import type { Category, HomeContent } from "@/lib/types";
 
+/* ---------------- USP bar (under the hero) ---------------- */
+export function UspBar() {
+  const items = [
+    "Free Shipping over ₹999",
+    "7-Day Easy Returns",
+    "100% Secure Payments",
+    "Cash on Delivery",
+  ];
+  return (
+    <div className="border-y border-line bg-surface">
+      <Container className="flex flex-wrap items-center justify-center gap-x-8 gap-y-1 py-3 text-center text-[0.68rem] font-medium uppercase tracking-[0.14em] text-ink/70">
+        {items.map((t, i) => (
+          <span key={t} className="flex items-center gap-8">
+            {i > 0 && <span className="hidden h-1 w-1 rounded-full bg-gold sm:block" />}
+            {t}
+          </span>
+        ))}
+      </Container>
+    </div>
+  );
+}
+
 /* ---------------- category tiles (Libas-style, full-bleed) ---------------- */
 export function CategoryTiles({ categories }: { categories: Category[] }) {
   const tiles = categories.slice(0, 4);

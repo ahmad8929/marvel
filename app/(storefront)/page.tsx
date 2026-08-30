@@ -3,15 +3,17 @@ import Image from "next/image";
 import type { Metadata } from "next";
 import { apiGet } from "@/lib/api";
 import type { HomeContent } from "@/lib/types";
-import { Container, Price } from "@/components/ui";
+import { Container } from "@/components/ui";
 import { HeroCarousel } from "@/components/storefront/HeroCarousel";
 import { Row } from "@/components/storefront/Carousels";
+import { ProductCard } from "@/components/storefront/ProductCard";
 import { NewsletterForm } from "@/components/storefront/NewsletterForm";
 import {
   CategoryTiles,
   ReviewsPolaroid,
   ServicesStrip,
   StyleJournal,
+  UspBar,
 } from "@/components/storefront/HomeSections";
 
 export const metadata: Metadata = {
@@ -27,6 +29,8 @@ export default async function HomePage() {
   return (
     <>
       <HeroCarousel slides={home.slides} />
+
+      <UspBar />
 
       <CategoryTiles categories={home.categories} />
 
@@ -45,23 +49,9 @@ export default async function HomePage() {
         </div>
         <Row>
           {home.newArrivals.map((p) => (
-            <Link key={p.id} href={`/products/${p.slug}`} className="w-[220px] shrink-0 snap-start">
-              <div className="relative aspect-[3/4] overflow-hidden bg-blush/30">
-                {p.images[0] && (
-                  <Image
-                    src={p.images[0].url}
-                    alt={p.images[0].alt ?? p.title}
-                    fill
-                    sizes="220px"
-                    className="object-cover"
-                  />
-                )}
-              </div>
-              <p className="mt-2 line-clamp-1 text-center text-sm">{p.title}</p>
-              <div className="mt-1 flex justify-center">
-                <Price price={p.price} mrp={p.mrp} size="sm" />
-              </div>
-            </Link>
+            <div key={p.id} className="w-[240px] shrink-0 snap-start">
+              <ProductCard product={p} />
+            </div>
           ))}
         </Row>
       </Container>

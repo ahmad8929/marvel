@@ -6,6 +6,14 @@ export type ProductImage = {
   isVideo?: boolean;
 };
 
+export type CardVariant = {
+  id: string;
+  size: string;
+  color: string;
+  colorHex: string | null;
+  stock: number;
+};
+
 export type ProductCard = {
   id: string;
   title: string;
@@ -17,6 +25,7 @@ export type ProductCard = {
   tags: string[];
   category: { name: string; slug: string };
   images: ProductImage[];
+  variants: CardVariant[];
   colours: Colour[];
   inStock: boolean;
   discountPercent: number;
@@ -86,9 +95,7 @@ export type HomeContent = {
     rating: number;
   }[];
   categories: Category[];
-  newArrivals: (Omit<ProductCard, "colours" | "inStock" | "variants"> & {
-    discountPercent: number;
-  })[];
+  newArrivals: ProductCard[];
   announcementText: string;
   announcementHref: string | null;
 };

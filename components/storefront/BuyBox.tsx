@@ -1,12 +1,13 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
-import { Check } from "lucide-react";
+import Link from "next/link";
+import { Check, Copy, RefreshCcw, ShieldCheck, Truck } from "lucide-react";
 import type { ProductDetail } from "@/lib/types";
 import { useCart } from "@/stores/cart";
 import { useUI } from "@/stores/ui";
-import { Button } from "@/components/ui";
+import { inr } from "@/lib/format";
 import { WishlistButton } from "./WishlistButton";
 
 export function BuyBox({ product }: { product: ProductDetail }) {
@@ -17,6 +18,10 @@ export function BuyBox({ product }: { product: ProductDetail }) {
   const [color, setColor] = useState(colours[0]?.name ?? "");
   const [size, setSize] = useState<string>("");
   const [added, setAdded] = useState(false);
+  const [needSize, setNeedSize] = useState(false);
+  const sizeRowRef = useRef<HTMLDivElement>(null);
+  const ctaRef = useRef<HTMLDivElement>(null);
+  const [showSticky, setShowSticky] = useState(false);
 
   const sizesForColor = useMemo(
     () =>
@@ -26,10 +31,34 @@ export function BuyBox({ product }: { product: ProductDetail }) {
     [product.variants, color],
   );
 
-  const selected = product.variants.find((v) => v.color === color && v.size === size);
+  // Auto-pick the first in-stock size whenever the colour changes.
+  useEffect(() => {
+    const firstInStock = sizesForColor.find((v) => v.stock > 0);
+    // eslint-disable-next-line react-hooks/set-state-in-effect
+    setSize(firstInStock ? firstInStock.size : "");
+  }, [sizesForColor]);
 
-  function addToCart() {
-    if (!selected) return;
+  // Sticky mobile CTA once the real button scrolls out of view.
+  useEffect(() => {
+    const el = ctaRef.current;
+    if (!el) return;
+    const io = new IntersectionObserver(
+      ([e]) => setShowSticky(!e.isIntersecting),
+      { rootMargin: "-80px 0px 0px 0px" },
+    );
+    io.observe(el);
+    return () => io.disconnect();
+  }, []);
+
+  const selected = product.variants.find((v) => v.color === color && v.size === size);
+  const soldOut = !product.variants.some((v) => v.stock > 0);
+
+  function addToCart(openDrawer = true): boolean {
+    if (!selected || selected.stock === 0) {
+      setNeedSize(true);
+      sizeRowRef.current?.scrollIntoView({ behavior: "smooth", block: "center" });
+      return false;
+    }
     add(
       {
         variantId: selected.id,
@@ -45,14 +74,19 @@ export function BuyBox({ product }: { product: ProductDetail }) {
       },
       1,
     );
+    setNeedSize(false);
     setAdded(true);
-    openCart();
-    setTimeout(() => setAdded(false), 1800);
+    if (openDrawer) openCart();
+    setTimeout(() => setAdded(false), 1600);
+    return true;
   }
 
   return (
     <div className="space-y-6">
-      {colours.length > 0 && (
+      {/* coupon nudge */}
+      <CouponNudge />
+
+      {colours.length > 1 && (
         <div>
           <p className="mb-2 text-sm font-medium">
             Colour: <span className="text-muted">{color}</span>
@@ -61,10 +95,7 @@ export function BuyBox({ product }: { product: ProductDetail }) {
             {colours.map((c) => (
               <button
                 key={c.name}
-                onClick={() => {
-                  setColor(c.name);
-                  setSize("");
-                }}
+                onClick={() => setColor(c.name)}
                 aria-pressed={c.name === color}
                 title={c.name}
                 className={`h-9 w-9 rounded-full border-2 ${
@@ -77,69 +108,125 @@ export function BuyBox({ product }: { product: ProductDetail }) {
         </div>
       )}
 
-      <div>
-        <p className="mb-2 text-sm font-medium">Size</p>
+      <div ref={sizeRowRef}>
+        <div className="mb-2 flex items-center justify-between">
+          <p className="text-sm font-medium">Size</p>
+          <Link href="/size-guide" className="text-xs text-primary underline underline-offset-2">
+            Size guide
+          </Link>
+        </div>
         <div className="flex flex-wrap gap-2">
           {sizesForColor.map((v) => (
             <button
               key={v.id}
               disabled={v.stock === 0}
-              onClick={() => setSize(v.size)}
+              onClick={() => {
+                setSize(v.size);
+                setNeedSize(false);
+              }}
               aria-pressed={v.size === size}
-              className={`min-w-11 rounded-lg border px-3 py-2 text-sm ${
+              className={`min-w-11 border px-3 py-2 text-sm ${
                 v.size === size
                   ? "border-primary bg-primary text-bg"
                   : "border-line hover:border-primary"
-              } disabled:cursor-not-allowed disabled:opacity-40`}
+              } disabled:cursor-not-allowed disabled:line-through disabled:opacity-40 ${
+                needSize ? "ring-1 ring-sale" : ""
+              }`}
             >
               {v.size}
             </button>
           ))}
         </div>
+        {needSize && <p className="mt-2 text-xs text-sale">Please select a size</p>}
         {selected && selected.stock > 0 && selected.stock <= 4 && (
-          <p className="mt-2 text-xs text-sale">Only {selected.stock} left</p>
+          <p className="mt-2 text-xs text-sale">Hurry — only {selected.stock} left</p>
         )}
       </div>
 
-      <div className="flex gap-3">
-        <Button
-          onClick={addToCart}
-          disabled={!selected || selected.stock === 0}
-          className="flex-1"
-          size="lg"
+      <div ref={ctaRef} className="flex gap-3">
+        <button
+          onClick={() => addToCart()}
+          disabled={soldOut}
+          className="flex-1 bg-primary py-3.5 text-xs font-medium uppercase tracking-[0.16em] text-bg hover:bg-primary-hover disabled:opacity-50"
         >
-          {added ? (
-            <>
-              <Check className="h-4 w-4" /> Added
-            </>
-          ) : selected && selected.stock === 0 ? (
-            "Sold out"
-          ) : (
-            "Add to bag"
-          )}
-        </Button>
-        <div className="grid place-items-center rounded-full border border-line px-3">
+          {soldOut ? "Sold out" : added ? "✓ Added to bag" : "Add to bag"}
+        </button>
+        <div className="grid w-12 place-items-center border border-line">
           <WishlistButton productId={product.id} className="bg-transparent shadow-none" />
         </div>
       </div>
 
-      <Button
-        variant="outline"
-        size="lg"
-        className="w-full"
-        disabled={!selected || selected.stock === 0}
+      <button
+        disabled={soldOut}
         onClick={() => {
-          addToCart();
-          router.push("/checkout");
+          if (addToCart(false)) router.push("/checkout");
         }}
+        className="w-full border border-primary py-3.5 text-xs font-medium uppercase tracking-[0.16em] text-primary hover:bg-blush disabled:opacity-50"
       >
         Buy it now
-      </Button>
+      </button>
 
-      <div className="rounded-xl border border-line bg-surface p-4 text-sm text-muted">
+      {/* trust row */}
+      <div className="grid grid-cols-3 gap-2 border-y border-line py-3 text-center text-[0.65rem] uppercase tracking-[0.1em] text-muted">
+        <span className="flex flex-col items-center gap-1">
+          <ShieldCheck className="h-4 w-4 text-gold" /> Secure checkout
+        </span>
+        <span className="flex flex-col items-center gap-1">
+          <Truck className="h-4 w-4 text-gold" /> COD available
+        </span>
+        <span className="flex flex-col items-center gap-1">
+          <RefreshCcw className="h-4 w-4 text-gold" /> 7-day returns
+        </span>
+      </div>
+
+      <div className="border border-line bg-surface p-4 text-sm text-muted">
         <PincodeCheck />
       </div>
+
+      {/* sticky mobile CTA */}
+      {showSticky && !soldOut && (
+        <div className="fixed inset-x-0 bottom-0 z-30 flex items-center gap-3 border-t border-line bg-bg/95 p-3 backdrop-blur md:hidden">
+          <div className="text-sm">
+            <span className="font-medium">{inr(product.price)}</span>
+            {product.discountPercent > 0 && (
+              <span className="ml-2 text-xs text-muted line-through">{inr(product.mrp)}</span>
+            )}
+          </div>
+          <button
+            onClick={() => addToCart()}
+            className="flex-1 bg-primary py-3 text-xs font-medium uppercase tracking-[0.14em] text-bg"
+          >
+            {added ? "✓ Added" : "Add to bag"}
+          </button>
+        </div>
+      )}
     </div>
+  );
+}
+
+function CouponNudge() {
+  const [copied, setCopied] = useState(false);
+  return (
+    <button
+      onClick={() => {
+        navigator.clipboard?.writeText("WELCOME10").then(
+          () => {
+            setCopied(true);
+            setTimeout(() => setCopied(false), 1500);
+          },
+          () => undefined,
+        );
+      }}
+      className="flex w-full items-center justify-between border border-dashed border-gold bg-gold/10 px-3 py-2 text-xs"
+    >
+      <span className="text-ink">
+        Use code <strong>WELCOME10</strong> for 10% off your first order
+      </span>
+      <span className="flex items-center gap-1 text-primary">
+        {copied ? <Check className="h-3.5 w-3.5" /> : <Copy className="h-3.5 w-3.5" />}
+        {copied ? "Copied" : "Copy"}
+      </span>
+    </button>
   );
 }
 
@@ -152,23 +239,25 @@ function PincodeCheck() {
         e.preventDefault();
         if (/^\d{6}$/.test(pin)) {
           const days = 3 + (Number(pin[5]) % 4);
-          setMsg(`Delivers in ~${days}–${days + 2} days · COD available`);
+          setMsg(`Delivers in ~${days}–${days + 2} days · Cash on delivery available`);
         } else {
           setMsg("Enter a valid 6-digit pincode");
         }
       }}
-      className="flex items-center gap-2"
+      className="flex flex-wrap items-center gap-2"
     >
+      <span className="text-xs font-medium uppercase tracking-wide text-ink">
+        Check delivery
+      </span>
       <input
         value={pin}
         onChange={(e) => setPin(e.target.value.replace(/\D/g, "").slice(0, 6))}
-        placeholder="Delivery pincode"
-        className="h-9 flex-1 rounded-lg border border-line bg-bg px-3 text-sm text-ink"
+        placeholder="Pincode"
+        className="h-9 w-32 border border-line bg-bg px-3 text-sm text-ink"
       />
       <button type="submit" className="text-sm font-medium text-primary">
         Check
       </button>
-      {msg && <span className="sr-only">{msg}</span>}
       {msg && <p className="basis-full pt-1 text-xs text-ink">{msg}</p>}
     </form>
   );

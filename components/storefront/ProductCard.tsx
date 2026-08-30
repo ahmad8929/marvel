@@ -1,11 +1,24 @@
+"use client";
+
+import { useState } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import { inr } from "@/lib/format";
 import type { ProductCard as Card } from "@/lib/types";
 import { WishlistButton } from "./WishlistButton";
+import { QuickAdd } from "./QuickAdd";
 
 export function ProductCard({ product }: { product: Card }) {
-  const [primary, hover] = product.images;
+  const images = product.images ?? [];
+  const variants = product.variants ?? [];
+  const colours = product.colours ?? [];
+  const [primary, hover] = images;
+  const [quick, setQuick] = useState<false | "add" | "buy">(false);
+  const lowStock =
+    product.inStock &&
+    variants.length > 0 &&
+    variants.reduce((n, v) => n + v.stock, 0) <= 6;
+
   return (
     <div className="group relative">
       <Link href={`/products/${product.slug}`} className="block">
@@ -33,6 +46,11 @@ export function ProductCard({ product }: { product: Card }) {
               {product.discountPercent}% off
             </span>
           )}
+          {lowStock && product.inStock && (
+            <span className="absolute right-0 top-3 bg-ink/80 px-2 py-0.5 text-[0.6rem] font-medium uppercase tracking-wide text-bg">
+              Almost gone
+            </span>
+          )}
           {!product.inStock && (
             <span className="absolute inset-x-0 bottom-0 bg-ink/70 py-1.5 text-center text-[0.65rem] font-medium uppercase tracking-[0.16em] text-bg">
               Sold out
@@ -40,9 +58,29 @@ export function ProductCard({ product }: { product: Card }) {
           )}
         </div>
       </Link>
+
       <div className="absolute right-2 top-2">
         <WishlistButton productId={product.id} />
       </div>
+
+      {/* quick add — always visible on touch, on hover for pointer devices */}
+      {product.inStock && (
+        <div className="absolute inset-x-2 bottom-[92px] flex gap-2 opacity-100 transition-opacity md:opacity-0 md:group-hover:opacity-100">
+          <button
+            onClick={() => setQuick("add")}
+            className="flex-1 bg-surface/95 py-2.5 text-[0.65rem] font-medium uppercase tracking-[0.14em] text-ink shadow-sm backdrop-blur hover:bg-primary hover:text-bg"
+          >
+            Add to bag
+          </button>
+          <button
+            onClick={() => setQuick("buy")}
+            className="hidden flex-1 bg-primary py-2.5 text-[0.65rem] font-medium uppercase tracking-[0.14em] text-bg hover:bg-primary-hover sm:block"
+          >
+            Buy now
+          </button>
+        </div>
+      )}
+
       <div className="mt-3 text-center">
         <Link
           href={`/products/${product.slug}`}
@@ -56,9 +94,9 @@ export function ProductCard({ product }: { product: Card }) {
             <span className="text-xs text-muted line-through">{inr(product.mrp)}</span>
           )}
         </div>
-        {product.colours.length > 1 && (
+        {colours.length > 1 && (
           <div className="mt-1.5 flex items-center justify-center gap-1">
-            {product.colours.slice(0, 5).map((c) => (
+            {colours.slice(0, 5).map((c) => (
               <span
                 key={c.name}
                 title={c.name}
@@ -69,6 +107,14 @@ export function ProductCard({ product }: { product: Card }) {
           </div>
         )}
       </div>
+
+      {quick && (
+        <QuickAdd
+          product={product}
+          buyNow={quick === "buy"}
+          onClose={() => setQuick(false)}
+        />
+      )}
     </div>
   );
 }
