@@ -15,6 +15,10 @@ export const SITE = {
   /** Pre-launch notice shown in the top announcement bar, site-wide. */
   announcement:
     "Orders open December 2026 — browse the collection now, checkout opens soon",
+  /** Dismissible pop-up shown once per visitor. */
+  popupTitle: "Opening this December",
+  popupBody:
+    "Explore the full collection now — we start accepting orders in December 2026.",
 } as const;
 
 /** Layer the pinned brand details over the settings returned by the API. */
