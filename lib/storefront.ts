@@ -1,4 +1,5 @@
 import { apiGet } from "./api";
+import { withSiteOverrides } from "./site";
 import type { Category, PublicSettings } from "./types";
 
 const FALLBACK_SETTINGS: PublicSettings = {
@@ -41,5 +42,5 @@ export async function getChrome(): Promise<{
       revalidate: 300,
     }).catch(() => FALLBACK_SETTINGS),
   ]);
-  return { categories: cats.data, settings };
+  return { categories: cats.data, settings: withSiteOverrides(settings) };
 }
