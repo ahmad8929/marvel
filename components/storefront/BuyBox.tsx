@@ -180,7 +180,6 @@ export function BuyBox({ product }: { product: ProductDetail }) {
         </span>
       </div>
 
-      <PincodeCheck />
 
       {/* sticky mobile CTA */}
       {showSticky && !soldOut && (
@@ -227,38 +226,5 @@ function CouponNudge() {
         </span>
       )}
     </button>
-  );
-}
-
-function PincodeCheck() {
-  const [pin, setPin] = useState("");
-  const [msg, setMsg] = useState<string | null>(null);
-  return (
-    <form
-      onSubmit={(e) => {
-        e.preventDefault();
-        if (/^\d{6}$/.test(pin)) {
-          const days = 3 + (Number(pin[5]) % 4);
-          setMsg(`Delivers in ~${days}–${days + 2} days · Cash on delivery available`);
-        } else {
-          setMsg("Enter a valid 6-digit pincode");
-        }
-      }}
-      className="flex flex-wrap items-center gap-2"
-    >
-      <span className="text-xs font-medium uppercase tracking-wide text-ink">
-        Check delivery
-      </span>
-      <input
-        value={pin}
-        onChange={(e) => setPin(e.target.value.replace(/\D/g, "").slice(0, 6))}
-        placeholder="Pincode"
-        className="h-9 w-32 border border-line bg-bg px-3 text-sm text-ink"
-      />
-      <button type="submit" className="text-sm font-medium text-primary">
-        Check
-      </button>
-      {msg && <p className="basis-full pt-1 text-xs text-ink">{msg}</p>}
-    </form>
   );
 }
