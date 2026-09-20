@@ -5,12 +5,12 @@ import { usePathname, useRouter } from "next/navigation";
 import { useEffect } from "react";
 import { useAuth } from "@/lib/auth-client";
 import { Container, Button } from "@/components/ui";
+import { ADMIN_URL } from "@/lib/site";
 
 const NAV = [
   ["/account", "Overview"],
   ["/account/orders", "Orders"],
   ["/account/addresses", "Addresses"],
-  ["/account/wishlist", "Wishlist"],
 ];
 
 export default function AccountLayout({ children }: { children: React.ReactNode }) {
@@ -43,6 +43,16 @@ export default function AccountLayout({ children }: { children: React.ReactNode 
               {label}
             </Link>
           ))}
+          {(user.role === "ADMIN" || user.role === "STAFF") && (
+            <a
+              href={ADMIN_URL}
+              target="_blank"
+              rel="noreferrer"
+              className="shrink-0 rounded-lg bg-primary px-3 py-2 text-sm font-medium text-bg hover:bg-primary-hover"
+            >
+              Admin panel ↗
+            </a>
+          )}
           <Button
             variant="ghost"
             size="sm"

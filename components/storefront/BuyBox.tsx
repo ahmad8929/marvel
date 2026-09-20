@@ -3,12 +3,11 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
-import { Check, Copy, RefreshCcw, ShieldCheck, Truck } from "lucide-react";
+import { Check, Copy, ShieldCheck, Truck } from "lucide-react";
 import type { ProductDetail } from "@/lib/types";
 import { useCart } from "@/stores/cart";
 import { useUI } from "@/stores/ui";
 import { inr } from "@/lib/format";
-import { WishlistButton } from "./WishlistButton";
 
 export function BuyBox({ product }: { product: ProductDetail }) {
   const router = useRouter();
@@ -149,9 +148,6 @@ export function BuyBox({ product }: { product: ProductDetail }) {
           >
             {soldOut ? "Sold out" : added ? "✓ Added to bag" : "Add to bag"}
           </button>
-          <div className="grid w-12 place-items-center border border-line">
-            <WishlistButton productId={product.id} className="bg-transparent shadow-none" />
-          </div>
         </div>
         <button
           disabled={soldOut}
@@ -174,9 +170,6 @@ export function BuyBox({ product }: { product: ProductDetail }) {
         </span>
         <span className="flex items-center gap-1">
           <Truck className="h-3.5 w-3.5 text-gold" /> Cash on delivery
-        </span>
-        <span className="flex items-center gap-1">
-          <RefreshCcw className="h-3.5 w-3.5 text-gold" /> 7-day easy returns
         </span>
       </div>
 

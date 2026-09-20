@@ -7,6 +7,9 @@ import type { PublicSettings } from "./types";
  * changed without a backend deploy. To hand control back to the admin panel
  * later, drop the matching lines from `withSiteOverrides` below.
  */
+/** Where the admin panel lives (override with NEXT_PUBLIC_ADMIN_URL). */
+export const ADMIN_URL = process.env.NEXT_PUBLIC_ADMIN_URL ?? "https://marvel-admin-two.vercel.app";
+
 export const SITE = {
   email: "marvelsindia1@gmail.com",
   phone: "+91 97940 10180",
@@ -15,10 +18,6 @@ export const SITE = {
   /** Pre-launch notice shown in the top announcement bar, site-wide. */
   announcement:
     "Orders open December 2026 — browse the collection now, checkout opens soon",
-  /** Dismissible pop-up shown once per visitor. */
-  popupTitle: "Opening this December",
-  popupBody:
-    "Explore the full collection now — we start accepting orders in December 2026.",
 } as const;
 
 /** Layer the pinned brand details over the settings returned by the API. */
@@ -34,3 +33,16 @@ export function withSiteOverrides(s: PublicSettings): PublicSettings {
     announcementHref: null,
   };
 }
+
+/**
+ * Photos used on the home page, picked from our own product shots.
+ * `image` is the index into that product's gallery (upload order).
+ */
+export const HERO_PICKS = [
+  { slug: "royal-blue-embellished-sharara-set", image: 0 },
+  { slug: "scarlet-gold-motif-kurta-sharara-set", image: 1 },
+  { slug: "lavender-silver-trim-bell-sleeve-set", image: 1 },
+  { slug: "butter-yellow-gold-border-palazzo-set", image: 2 },
+] as const;
+
+export const FEATURE_PICK = { slug: "maroon-gold-zari-embroidered-sharara-set", image: 2 } as const;

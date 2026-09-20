@@ -7,6 +7,8 @@ import { inr } from "@/lib/format";
 import type { ProductCard as Card } from "@/lib/types";
 import { WishlistButton } from "./WishlistButton";
 import { QuickAdd } from "./QuickAdd";
+import { FloatCard } from "./FloatCard";
+import { Reveal } from "./Reveal";
 
 export function ProductCard({ product }: { product: Card }) {
   const images = product.images ?? [];
@@ -129,8 +131,12 @@ export function ProductGrid({ products }: { products: Card[] }) {
   }
   return (
     <div className="grid grid-cols-2 gap-x-4 gap-y-10 md:grid-cols-3 lg:grid-cols-4">
-      {products.map((p) => (
-        <ProductCard key={p.id} product={p} />
+      {products.map((p, i) => (
+        <Reveal key={p.id} delay={(i % 4) * 90}>
+          <FloatCard index={i}>
+            <ProductCard product={p} />
+          </FloatCard>
+        </Reveal>
       ))}
     </div>
   );

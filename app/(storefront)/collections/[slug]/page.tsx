@@ -11,13 +11,23 @@ export const revalidate = 3600;
 
 type SearchParams = Promise<Record<string, string | string[] | undefined>>;
 
+/** Virtual collection that lists every product (no category filter). */
+const ALL_SLUG = "the-collection";
+const ALL_CATEGORY = {
+  id: ALL_SLUG,
+  name: "The Collection",
+  slug: ALL_SLUG,
+  description: "Every piece from Marvel's, all in one place.",
+} as unknown as Category;
+
 async function getData(slug: string, sp: Record<string, string | string[] | undefined>) {
-  const category = await apiGet<Category>(`/categories/${slug}`, {
-    tags: ["nav", `category:${slug}`],
-  });
+  const category =
+    slug === ALL_SLUG
+      ? ALL_CATEGORY
+      : await apiGet<Category>(`/categories/${slug}`, { tags: ["nav", `category:${slug}`] });
   const qs = new URLSearchParams();
-  qs.set("category", slug);
-  for (const key of ["sort", "size", "color", "minPrice", "maxPrice", "inStock", "page"]) {
+  if (slug !== ALL_SLUG) qs.set("category", slug);
+  for (const key of ["sort", "size", "color", "tag", "minPrice", "maxPrice", "inStock", "page"]) {
     const v = sp[key];
     if (typeof v === "string" && v) qs.set(key, v);
   }
@@ -35,7 +45,8 @@ export async function generateMetadata({
 }): Promise<Metadata> {
   const { slug } = await params;
   try {
-    const category = await apiGet<Category>(`/categories/${slug}`, { tags: ["nav"] });
+    const category =
+      slug === ALL_SLUG ? ALL_CATEGORY : await apiGet<Category>(`/categories/${slug}`, { tags: ["nav"] });
     return {
       title: `${category.name} for Women`,
       description:
@@ -66,9 +77,9 @@ export default async function CollectionPage({
   }
 
   const { category, products } = data;
-  const colours = [
-    ...new Set(products.data.flatMap((p) => p.colours.map((c) => c.name))),
-  ].sort();
+  const colourMap = new Map<string, string | null>();
+  for (const p of products.data) for (const c of p.colours) if (!colourMap.has(c.name)) colourMap.set(c.name, c.hex);
+  const colours = [...colourMap].map(([name, hex]) => ({ name, hex })).sort((a, b) => a.name.localeCompare(b.name));
 
   return (
     <Container className="py-8">

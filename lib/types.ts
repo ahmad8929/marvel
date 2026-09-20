@@ -93,6 +93,7 @@ export type HomeContent = {
     location: string | null;
     quote: string;
     rating: number;
+    avatar?: string | null;
   }[];
   categories: Category[];
   newArrivals: ProductCard[];

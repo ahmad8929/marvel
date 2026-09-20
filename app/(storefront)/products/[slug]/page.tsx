@@ -149,16 +149,9 @@ export default async function ProductPage({
                   ),
                 },
                 {
-                  title: "Shipping & Returns",
+                  title: "Shipping",
                   content: (
-                    <p>
-                      Dispatched in 2 business days. 7-day easy returns on unworn
-                      items with tags. See{" "}
-                      <Link href="/pages/returns-refunds" className="text-primary underline">
-                        our policy
-                      </Link>
-                      .
-                    </p>
+                    <p>Dispatched in 2 business days. Free shipping on orders over ₹999.</p>
                   ),
                 },
               ]}

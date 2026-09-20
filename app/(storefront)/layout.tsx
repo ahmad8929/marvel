@@ -1,7 +1,6 @@
 import { AuthProvider } from "@/lib/auth-client";
 import { Header } from "@/components/storefront/Header";
 import { Footer } from "@/components/storefront/Footer";
-import { PreLaunchPopup } from "@/components/storefront/PreLaunchPopup";
 import { getChrome } from "@/lib/storefront";
 
 export default async function StorefrontLayout({
@@ -21,7 +20,6 @@ export default async function StorefrontLayout({
       />
       <div className="flex-1">{children}</div>
       <Footer categories={categories} settings={settings} />
-      <PreLaunchPopup />
     </AuthProvider>
   );
 }

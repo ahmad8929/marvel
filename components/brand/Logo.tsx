@@ -1,64 +1,103 @@
+import { useId } from "react";
 import { cn } from "@/lib/utils";
+import { LOGO } from "./logo-paths";
 
-/** Monogram mark — gold hanger + heart, maroon serif M with a feminine sweep. */
-export function LogoMark({ className }: { className?: string }) {
+type Tone = "dark" | "light" | "pink";
+const MAROON = "#57102A";
+
+const GOLD_LIGHT = ["#F6DA8E", "#E8B84F", "#EFC768", "#D19A38", "#F0CB6E"];
+const GOLD_DEEP = ["#D9A845", "#B98428", "#CE9A3B"];
+const PINK = ["#EE8DAF", "#D9527F", "#E77399"];
+
+/** Two gradients per logo: `${id}m` for the main strokes, `${id}a` for accents. */
+function Defs({ id, tone }: { id: string; tone: Tone }) {
+  const main = tone === "light" ? GOLD_LIGHT : tone === "pink" ? PINK : null;
+  const accent = tone === "light" ? GOLD_LIGHT : GOLD_DEEP;
+  const grad = (gid: string, stops: string[]) => (
+    <linearGradient id={gid} x1="150" y1="150" x2="640" y2="660" gradientUnits="userSpaceOnUse">
+      {stops.map((c, i) => (
+        <stop key={i} offset={i / (stops.length - 1)} stopColor={c} />
+      ))}
+    </linearGradient>
+  );
   return (
-    <svg viewBox="0 0 128 128" className={className} role="img" aria-label="Marvel's Online Clothings">
-      <path
-        d="M64 28 C60 21 52 19 52 12.5 C52 7.5 58 6.5 64 12.5 C70 6.5 76 7.5 76 12.5 C76 19 68 21 64 28 Z"
-        className="fill-gold"
-      />
-      <path d="M64 27 C64 34 61 39 64 45" fill="none" strokeWidth="3.4" strokeLinecap="round" className="stroke-gold" />
-      <path
-        d="M64 45 L35 59.5 Q64 66.5 93 59.5 L64 45"
-        fill="none"
-        strokeWidth="3.4"
-        strokeLinejoin="round"
-        strokeLinecap="round"
-        className="stroke-gold"
-      />
-      <path
-        d="M34 104 L34 68 Q49 90 64 100 Q79 90 94 68 L94 104"
-        fill="none"
-        strokeWidth="12"
-        strokeLinecap="round"
-        strokeLinejoin="round"
-        className="stroke-primary"
-      />
-      <circle cx="64" cy="66.5" r="3.6" className="fill-gold" />
-      <path d="M64 70 C60 78 59 88 64 96 C69 88 68 78 64 70 Z" className="fill-gold" />
+    <defs>
+      {main && grad(`${id}m`, main)}
+      {grad(`${id}a`, accent)}
+    </defs>
+  );
+}
+
+const colours = (tone: Tone, id: string) => ({
+  main: tone === "dark" ? MAROON : `url(#${id}m)`,
+  accent: `url(#${id}a)`,
+});
+
+/** Monogram: frame + M + laurel. */
+export function LogoMark({ className, tone = "dark" }: { className?: string; tone?: Tone }) {
+  const id = useId().replace(/:/g, "");
+  const c = colours(tone, id);
+  return (
+    <svg viewBox="226 140 372 318" className={className} role="img" aria-label="Marvel’s">
+      <Defs id={id} tone={tone} />
+      <path d={LOGO.frame} fill="none" stroke={c.main} strokeWidth={5.5} strokeLinecap="square" />
+      <path d={LOGO.m} fill={c.main} />
+      <g fill={c.accent}>
+        <path d={LOGO.stem} fill="none" stroke={c.accent} strokeWidth={4} strokeLinecap="round" />
+        {LOGO.leaves.map((l, i) => (
+          <path key={i} transform={l.t} d={l.d} />
+        ))}
+      </g>
     </svg>
   );
 }
 
-export function Logo({
-  className,
-  tone = "dark",
-}: {
-  className?: string;
-  tone?: "dark" | "light";
-}) {
+/** "MARVEL’S — CLOTHING" lettering, outlined (no font needed). */
+export function LogoWordmark({ className, tone = "dark" }: { className?: string; tone?: Tone }) {
+  const id = useId().replace(/:/g, "");
+  const c = colours(tone, id);
+  return (
+    <svg viewBox="122 476 534 190" className={className} role="img" aria-label="Marvel’s Clothing">
+      <Defs id={id} tone={tone} />
+      <path d={LOGO.wordmark} fill={c.main} />
+      <path d={LOGO.clothing} fill={c.main} />
+      <path d={LOGO.lineL} fill={c.accent} />
+      <path d={LOGO.lineR} fill={c.accent} />
+      <path d={LOGO.star} fill={c.accent} />
+    </svg>
+  );
+}
+
+/** Header / footer lockup: mark + wordmark side by side. */
+export function Logo({ className, tone = "dark" }: { className?: string; tone?: Tone }) {
   return (
     <span className={cn("flex items-center gap-2.5", className)}>
-      <LogoMark className="h-9 w-9 shrink-0" />
-      <span className="flex flex-col leading-none">
-        <span
-          className={cn(
-            "font-display text-lg font-semibold tracking-[0.18em]",
-            tone === "light" ? "text-bg" : "text-primary",
-          )}
-        >
-          MARVEL&apos;S
-        </span>
-        <span
-          className={cn(
-            "mt-0.5 text-[0.55rem] tracking-[0.34em]",
-            tone === "light" ? "text-blush" : "text-muted",
-          )}
-        >
-          ONLINE CLOTHINGS
-        </span>
-      </span>
+      <LogoMark tone={tone} className="h-11 w-auto shrink-0" />
+      <LogoWordmark tone={tone} className="h-10 w-auto shrink-0" />
     </span>
+  );
+}
+
+/** Full stacked logo for splash / auth / 404 pages. */
+export function LogoStacked({ className, tone = "dark" }: { className?: string; tone?: Tone }) {
+  const id = useId().replace(/:/g, "");
+  const c = colours(tone, id);
+  return (
+    <svg viewBox="120 140 540 530" className={className} role="img" aria-label="Marvel’s Clothing">
+      <Defs id={id} tone={tone} />
+      <path d={LOGO.frame} fill="none" stroke={c.main} strokeWidth={5.5} strokeLinecap="square" />
+      <path d={LOGO.m} fill={c.main} />
+      <g fill={c.accent}>
+        <path d={LOGO.stem} fill="none" stroke={c.accent} strokeWidth={4} strokeLinecap="round" />
+        {LOGO.leaves.map((l, i) => (
+          <path key={i} transform={l.t} d={l.d} />
+        ))}
+      </g>
+      <path d={LOGO.wordmark} fill={c.main} />
+      <path d={LOGO.clothing} fill={c.main} />
+      <path d={LOGO.lineL} fill={c.accent} />
+      <path d={LOGO.lineR} fill={c.accent} />
+      <path d={LOGO.star} fill={c.accent} />
+    </svg>
   );
 }

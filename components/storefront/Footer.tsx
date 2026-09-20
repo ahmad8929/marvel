@@ -1,8 +1,7 @@
 import Link from "next/link";
 import { Container } from "@/components/ui";
 import { Logo } from "@/components/brand/Logo";
-import { NewsletterForm } from "./NewsletterForm";
-import { NAV_GROUPS } from "@/lib/nav";
+import { FACET_GROUPS } from "@/lib/nav";
 import type { Category, PublicSettings } from "@/lib/types";
 
 export function Footer({
@@ -17,16 +16,13 @@ export function Footer({
       {/* SEO category links */}
       <div className="border-t border-line bg-bg">
         <Container className="space-y-6 py-12">
-          {NAV_GROUPS.map((g) => (
-            <div key={g.slug}>
+          {FACET_GROUPS.map((g) => (
+            <div key={g.title}>
               <p className="mb-2 text-xs font-semibold uppercase tracking-[0.14em] text-primary">
-                {g.title} — top categories
+                {g.title}
               </p>
               <p className="text-[0.8rem] leading-7 text-muted">
-                {[
-                  { label: `All ${g.title}`, href: `/collections/${g.slug}` },
-                  ...g.links,
-                ].map((l, i) => (
+                {g.links.map((l, i) => (
                   <span key={l.href}>
                     {i > 0 && <span className="px-1.5 text-line">|</span>}
                     <Link href={l.href} className="hover:text-primary hover:underline">
@@ -63,7 +59,7 @@ export function Footer({
                 </li>
               ))}
               <li>
-                <Link href="/collections/kurtis?sort=newest" className="hover:text-bg">
+                <Link href="/collections/the-collection?tag=new-in&sort=newest" className="hover:text-bg">
                   New Arrivals
                 </Link>
               </li>
@@ -83,14 +79,9 @@ export function Footer({
           </div>
 
           <div className="space-y-4">
-            <h3 className="text-xs font-semibold uppercase tracking-[0.2em] text-bg">
-              Join the list
-            </h3>
-            <p className="text-sm text-blush/80">
-              New drops, styling notes and offers — straight to your inbox.
-            </p>
-            <NewsletterForm compact />
-            <div className="flex gap-3 pt-1 text-sm">
+            <h3 className="text-xs font-semibold uppercase tracking-[0.2em] text-bg">Follow us</h3>
+            <p className="text-sm text-blush/80">New drops, styling notes and first looks.</p>
+            <div className="flex gap-4 pt-1 text-sm">
               {settings.instagramUrl && (
                 <a href={settings.instagramUrl} className="hover:text-bg" rel="noreferrer" target="_blank">
                   Instagram
